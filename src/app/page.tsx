@@ -1,15 +1,24 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
-import TradingChart from "@/components/TradingChart";
-import SignalPanel from "@/components/SignalPanel";
+import { LayoutGrid, TrendingUp, History, Shield, Activity, RefreshCw } from "lucide-react";
 import { fetchBinanceKlines } from "@/lib/binance";
 import { getGeminiSignals } from "@/lib/gemini";
 import { calculateRSI, calculateEMA, calculateBollingerBands } from "@/lib/indicators";
 import { getTradeHistory } from "@/lib/db";
 import { executeTradeAction } from "./actions";
-import { LayoutGrid, TrendingUp, History, Shield, Activity, RefreshCw } from "lucide-react";
+
+// Dynamic imports with SSR disabled to prevent hydration mismatches
+const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false });
+const TradingChart = dynamic(() => import("@/components/TradingChart"), { 
+  ssr: false,
+  loading: () => <div className="w-full h-full bg-white/5 animate-pulse rounded-xl" />
+});
+const SignalPanel = dynamic(() => import("@/components/SignalPanel"), { 
+  ssr: false,
+  loading: () => <div className="w-full h-full bg-white/5 animate-pulse rounded-xl" />
+});
 
 
 
@@ -138,9 +147,9 @@ export default function Dashboard() {
                 <span className="text-[10px] uppercase text-white/40 tracking-widest mb-1 block">Trade History</span>
                 <div className="flex gap-2">
                   {tradeHistory.map((t, i) => (
-                    <div key={i} className={`w-2 h-2 rounded-full ${t.side === 'BUY' ? 'bg-primary' : 'bg-accent'}`} title={`${t.side} ${t.quantity} ${t.symbol}`} />
+                    <div key={i} className={`w-2 h-2 rounded-full ${t?.side === 'BUY' ? 'bg-primary' : 'bg-accent'}`} title={`${t?.side} ${t?.quantity} ${t?.symbol}`} />
                   ))}
-                  {tradeHistory.length === 0 && <span className="text-xs text-white/20 italic">Awaiting first trade...</span>}
+                  {(tradeHistory === null || tradeHistory.length === 0) && <span className="text-xs text-white/20 italic">Awaiting first trade...</span>}
                 </div>
               </div>
               <button 
