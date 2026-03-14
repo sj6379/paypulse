@@ -47,9 +47,9 @@ export default function SignalPanel({ signal, loading, onRefresh, onApprove }: S
       ) : (
         <div className="flex-1 space-y-6">
           <div className="space-y-2">
-            <div className="flex justify-between items-center text-[10px] uppercase text-white/40 tracking-widest">
-              <span>Recommendation</span>
-              <span>Confidence: {signal.confidence}%</span>
+            <div className="flex items-center gap-2 text-xs text-white/40">
+              <div className={`w-2 h-2 rounded-full ${signal?.confidence > 70 ? 'bg-primary' : 'bg-accent'}`} />
+              <span>Confidence: {signal?.confidence || 0}%</span>
             </div>
             <div className={`text-4xl font-black italic tracking-tighter ${
               signal?.signal?.includes('BUY') ? 'text-primary' : 'text-accent'
@@ -63,22 +63,22 @@ export default function SignalPanel({ signal, loading, onRefresh, onApprove }: S
               <Zap className="w-3 h-3" /> Reasoning
             </h4>
             <p className="text-sm text-white/80 leading-relaxed font-medium">
-              {signal.reasoning}
+              {signal?.reasoning || "Analyzing data..."}
             </p>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
               <div className="text-[10px] uppercase text-white/40 mb-1">Entry</div>
-              <div className="text-sm font-bold text-white">{signal.entry}</div>
+              <div className="text-sm font-bold text-white">{signal?.entry || "--"}</div>
             </div>
             <div className="text-center">
               <div className="text-[10px] uppercase text-white/40 mb-1">Target</div>
-              <div className="text-sm font-bold text-primary">{signal.target}</div>
+              <div className="text-sm font-bold text-primary">{signal?.target || "--"}</div>
             </div>
             <div className="text-center">
               <div className="text-[10px] uppercase text-white/40 mb-1">Stop</div>
-              <div className="text-sm font-bold text-accent">{signal.stopLoss}</div>
+              <div className="text-sm font-bold text-accent">{signal?.stopLoss || "--"}</div>
             </div>
           </div>
 

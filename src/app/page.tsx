@@ -73,7 +73,7 @@ export default function Dashboard() {
   const handleApproveTrade = async (quantity: number) => {
     if (!signal) return;
     
-    const side = signal.signal.includes("BUY") ? "BUY" : "SELL";
+    const side = signal?.signal?.includes("BUY") ? "BUY" : "SELL";
     const currentPrice = chartData[chartData.length - 1]?.close;
     
     try {
