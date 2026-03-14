@@ -52,9 +52,9 @@ export default function SignalPanel({ signal, loading, onRefresh, onApprove }: S
               <span>Confidence: {signal.confidence}%</span>
             </div>
             <div className={`text-4xl font-black italic tracking-tighter ${
-              signal.signal.includes('BUY') ? 'text-primary' : 'text-accent'
+              signal?.signal?.includes('BUY') ? 'text-primary' : 'text-accent'
             }`}>
-              {signal.signal}
+              {signal?.signal}
             </div>
           </div>
 

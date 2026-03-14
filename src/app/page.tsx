@@ -30,21 +30,25 @@ export default function Dashboard() {
 
   useEffect(() => {
     const loadData = async () => {
-      const [data, history] = await Promise.all([
-        fetchBinanceKlines(symbol),
-        getTradeHistory(5)
-      ]);
-      
-      setChartData(data);
-      setTradeHistory(history);
-      
-      if (data.length > 20) {
-        setIndicators({
-          rsi: calculateRSI(data),
-          ema9: calculateEMA(data, 9),
-          ema21: calculateEMA(data, 21),
-          bb: calculateBollingerBands(data)
-        });
+      try {
+        const [data, history] = await Promise.all([
+          fetchBinanceKlines(symbol),
+          getTradeHistory(5)
+        ]);
+        
+        setChartData(data);
+        setTradeHistory(history);
+        
+        if (data && data.length > 20) {
+          setIndicators({
+            rsi: calculateRSI(data),
+            ema9: calculateEMA(data, 9),
+            ema21: calculateEMA(data, 21),
+            bb: calculateBollingerBands(data)
+          });
+        }
+      } catch (error) {
+        console.error("❌ Dashboard Data Load Failed:", error);
       }
     };
     loadData();
