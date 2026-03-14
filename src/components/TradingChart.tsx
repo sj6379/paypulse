@@ -16,50 +16,56 @@ export default function TradingChart({ data, symbol }: ChartProps) {
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
-    const chart = createChart(chartContainerRef.current, {
-      layout: {
-        background: { type: ColorType.Solid, color: "transparent" },
-        textColor: "rgba(255, 255, 255, 0.5)",
-      },
-      grid: {
-        vertLines: { color: "rgba(255, 255, 255, 0.05)" },
-        horzLines: { color: "rgba(255, 255, 255, 0.05)" },
-      },
-      width: chartContainerRef.current.clientWidth,
-      height: 500,
-      timeScale: {
-        borderColor: "rgba(255, 255, 255, 0.1)",
-      },
-      rightPriceScale: {
-        borderColor: "rgba(255, 255, 255, 0.1)",
-      },
-    });
+    try {
+      const chart = createChart(chartContainerRef.current, {
+        layout: {
+          background: { type: ColorType.Solid, color: "transparent" },
+          textColor: "rgba(255, 255, 255, 0.5)",
+        },
+        grid: {
+          vertLines: { color: "rgba(255, 255, 255, 0.05)" },
+          horzLines: { color: "rgba(255, 255, 255, 0.05)" },
+        },
+        width: chartContainerRef.current.clientWidth || 300,
+        height: 500,
+        timeScale: {
+          borderColor: "rgba(255, 255, 255, 0.1)",
+        },
+        rightPriceScale: {
+          borderColor: "rgba(255, 255, 255, 0.1)",
+        },
+      });
 
-    const candlestickSeries = (chart as any).addCandlestickSeries({
-      upColor: "#00f2fe",
-      downColor: "#7000ff",
-      borderVisible: false,
-      wickUpColor: "#00f2fe",
-      wickDownColor: "#7000ff",
-    });
+      const candlestickSeries = (chart as any).addCandlestickSeries({
+        upColor: "#00f2fe",
+        downColor: "#7000ff",
+        borderVisible: false,
+        wickUpColor: "#00f2fe",
+        wickDownColor: "#7000ff",
+      });
 
-    candlestickSeries.setData(data);
-    
-    chartRef.current = chart;
-    seriesRef.current = candlestickSeries;
-
-    const handleResize = () => {
-      if (chartContainerRef.current && chartRef.current) {
-        chartRef.current.applyOptions({ width: chartContainerRef.current.clientWidth });
+      if (Array.isArray(data) && data.length > 0) {
+        candlestickSeries.setData(data);
       }
-    };
+      
+      chartRef.current = chart;
+      seriesRef.current = candlestickSeries;
 
-    window.addEventListener("resize", handleResize);
+      const handleResize = () => {
+        if (chartContainerRef.current && chartRef.current) {
+          chartRef.current.applyOptions({ width: chartContainerRef.current.clientWidth });
+        }
+      };
 
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      chart.remove();
-    };
+      window.addEventListener("resize", handleResize);
+
+      return () => {
+        window.removeEventListener("resize", handleResize);
+        chart.remove();
+      };
+    } catch (error) {
+      console.error("❌ Chart Initialization Failed:", error);
+    }
   }, [data]);
 
   return (
