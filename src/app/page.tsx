@@ -49,12 +49,13 @@ export default function Dashboard() {
         setTradeHistory(history);
         
         if (data && data.length > 20) {
-          setIndicators({
+          const calculatedIndicators = {
             rsi: calculateRSI(data),
             ema9: calculateEMA(data, 9),
             ema21: calculateEMA(data, 21),
             bb: calculateBollingerBands(data)
-          });
+          };
+          setIndicators(calculatedIndicators);
         }
       } catch (error) {
         console.error("❌ Dashboard Data Load Failed:", error);
@@ -64,6 +65,13 @@ export default function Dashboard() {
     const interval = setInterval(loadData, 60000); // Update every minute
     return () => clearInterval(interval);
   }, [symbol]);
+
+  // Auto-refresh signal when indicators are ready for the first time
+  useEffect(() => {
+    if (indicators && !signal && !loadingSignal) {
+      handleRefreshSignal();
+    }
+  }, [indicators, signal, loadingSignal]);
 
   const handleRefreshSignal = async () => {
     if (!indicators || chartData.length < 10) return;

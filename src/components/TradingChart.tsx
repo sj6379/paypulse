@@ -13,9 +13,12 @@ export default function TradingChart({ data, symbol }: ChartProps) {
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
 
+  // 1. Initialize Chart
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
+    console.log("📊 Initializing Chart Instance...");
+    
     try {
       const chart = createChart(chartContainerRef.current, {
         layout: {
@@ -28,13 +31,14 @@ export default function TradingChart({ data, symbol }: ChartProps) {
         },
         width: chartContainerRef.current.clientWidth || 300,
         height: 500,
-        timeScale: {
-          borderColor: "rgba(255, 255, 255, 0.1)",
-        },
-        rightPriceScale: {
-          borderColor: "rgba(255, 255, 255, 0.1)",
-        },
+        timeScale: { borderColor: "rgba(255, 255, 255, 0.1)" },
+        rightPriceScale: { borderColor: "rgba(255, 255, 255, 0.1)" },
       });
+
+      // Verification of method existence
+      if (typeof (chart as any).addCandlestickSeries !== 'function') {
+        throw new Error("Chart instance is missing addCandlestickSeries method. Check library version.");
+      }
 
       const candlestickSeries = (chart as any).addCandlestickSeries({
         upColor: "#00f2fe",
@@ -44,10 +48,6 @@ export default function TradingChart({ data, symbol }: ChartProps) {
         wickDownColor: "#7000ff",
       });
 
-      if (Array.isArray(data) && data.length > 0) {
-        candlestickSeries.setData(data);
-      }
-      
       chartRef.current = chart;
       seriesRef.current = candlestickSeries;
 
@@ -62,11 +62,26 @@ export default function TradingChart({ data, symbol }: ChartProps) {
       return () => {
         window.removeEventListener("resize", handleResize);
         chart.remove();
+        chartRef.current = null;
+        seriesRef.current = null;
       };
     } catch (error) {
       console.error("❌ Chart Initialization Failed:", error);
     }
-  }, [data]);
+  }, []); // Run only once
+
+  // 2. Update Data
+  useEffect(() => {
+    if (seriesRef.current && Array.isArray(data) && data.length > 0) {
+      console.log("📈 Updating Chart Data:", data.length, "points");
+      try {
+        seriesRef.current.setData(data);
+        chartRef.current?.timeScale().fitContent();
+      } catch (error) {
+        console.error("❌ Failed to set chart data:", error);
+      }
+    }
+  }, [data]); // Run when data updates
 
   return (
     <div className="relative w-full h-full flex flex-col p-4">
